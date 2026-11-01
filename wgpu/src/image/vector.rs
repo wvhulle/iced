@@ -161,7 +161,7 @@ impl Cache {
                 let mut rgba = img.take();
 
                 if let Some(color) = color {
-                    rgba.chunks_exact_mut(4).for_each(|rgba| {
+                    rgba.as_chunks_mut::<4>().0.iter_mut().for_each(|rgba| {
                         if rgba[3] > 0 {
                             rgba[0] = color[0];
                             rgba[1] = color[1];

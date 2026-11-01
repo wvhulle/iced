@@ -395,12 +395,12 @@ where
                 .downcast_ref::<State<Link, Renderer::Paragraph>>();
 
             self.hovered_link =
-                state.paragraph.hit_span(position).and_then(|span| {
-                    if self.spans.as_ref().as_ref().get(span)?.link.is_some() {
-                        Some(span)
-                    } else {
-                        None
-                    }
+                state.paragraph.hit_span(position).filter(|&span| {
+                    self.spans
+                        .as_ref()
+                        .as_ref()
+                        .get(span)
+                        .is_some_and(|span| span.link.is_some())
                 });
         } else {
             self.hovered_link = None;

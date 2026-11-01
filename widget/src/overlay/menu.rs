@@ -378,8 +378,6 @@ where
         renderer: &Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
-        use std::f32;
-
         let text_size =
             self.text_size.unwrap_or_else(|| renderer.default_size());
 
