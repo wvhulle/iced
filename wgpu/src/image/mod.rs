@@ -11,7 +11,7 @@ mod vector;
 
 use crate::Buffer;
 use crate::core::border;
-use crate::core::{Rectangle, Size, Transformation};
+use crate::core::{Point, Rectangle, Size, Transformation};
 use crate::graphics::Shell;
 
 use bytemuck::{Pod, Zeroable};
@@ -313,7 +313,16 @@ impl State {
                     bounds,
                     clip_bounds,
                 } => {
-                    let physical_bounds = (*bounds * scale).round();
+                    let physical_bounds = Rectangle::new(
+                        Point::new(
+                            (bounds.x * scale).round(),
+                            (bounds.y * scale).round(),
+                        ),
+                        Size::new(
+                            (bounds.width * scale).round(),
+                            (bounds.height * scale).round(),
+                        ),
+                    );
 
                     if physical_bounds.width < 1.0
                         || physical_bounds.height < 1.0
