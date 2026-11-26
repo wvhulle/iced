@@ -107,7 +107,8 @@ impl Example {
         let content = column![
             circle(self.radius),
             text!("Radius: {:.2}", self.radius),
-            slider(1.0..=100.0, self.radius, Message::RadiusChanged).step(0.01),
+            slider(1.0..=100.0, self.radius, Message::RadiusChanged)
+                .step(0.01_f32),
         ]
         .padding(20)
         .spacing(20)

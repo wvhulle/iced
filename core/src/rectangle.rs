@@ -245,6 +245,19 @@ impl Rectangle<f32> {
         }
     }
 
+    /// Rounds the [`Rectangle`] coordinates.
+    pub fn round(self) -> Self {
+        let left = self.x.round();
+        let top = self.y.round();
+
+        Self {
+            x: left,
+            y: top,
+            width: (self.x + self.width).round() - left,
+            height: (self.y + self.height).round() - top,
+        }
+    }
+
     /// Snaps the [`Rectangle`] to __unsigned__ integer coordinates.
     pub fn snap(self) -> Option<Rectangle<u32>> {
         let top_left = self.position().snap();

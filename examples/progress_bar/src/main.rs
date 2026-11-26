@@ -52,7 +52,7 @@ impl Progress {
                     column![
                         bar,
                         slider(0.0..=100.0, self.value, Message::SliderChanged)
-                            .step(0.01)
+                            .step(0.01_f32)
                     ]
                     .spacing(20),
                 )

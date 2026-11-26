@@ -20,6 +20,7 @@ use crate::runtime::user_interface;
 use crate::runtime::{Task, UserInterface};
 use crate::{Instruction, Selector};
 
+use std::env;
 use std::fmt;
 
 /// A headless runtime that can run iced applications and execute
@@ -95,11 +96,13 @@ impl<P: Program + 'static> Emulator<P> {
         // TODO: Error handling
         let executor = P::Executor::new().expect("Create emulator executor");
 
+        let backend = env::var("ICED_TEST_BACKEND").ok();
+
         let renderer = executor
             .block_on(P::Renderer::new(
                 settings.default_font,
                 settings.default_text_size,
-                None,
+                backend.as_deref(),
             ))
             .expect("Create emulator renderer");
 
@@ -248,11 +251,10 @@ impl<P: Program + 'static> Emulator<P> {
                                 let _ = sender.send(1.0);
                             }
                         }
-                        window::Action::GetMode(id, sender) => {
-                            if id == self.window {
-                                let _ =
-                                    sender.send(core::window::Mode::Windowed);
-                            }
+                        window::Action::GetMode(id, sender)
+                            if id == self.window =>
+                        {
+                            let _ = sender.send(core::window::Mode::Windowed);
                         }
                         _ => {
                             // Ignored
@@ -464,7 +466,7 @@ impl<P: Program + 'static> Emulator<P> {
             &[core::Event::Window(window::Event::RedrawRequested(
                 Instant::now(),
             ))],
-            mouse::Cursor::Unavailable,
+            self.cursor,
             &mut self.renderer,
             &mut self.clipboard,
             &mut Vec::new(),
@@ -476,8 +478,10 @@ impl<P: Program + 'static> Emulator<P> {
             &renderer::Style {
                 text_color: style.text_color,
             },
-            mouse::Cursor::Unavailable,
+            self.cursor,
         );
+
+        self.cache = Some(user_interface.into_cache());
 
         let physical_size = Size::new(
             (self.size.width * scale_factor).round() as u32,

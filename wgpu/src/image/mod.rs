@@ -11,7 +11,7 @@ mod vector;
 
 use crate::Buffer;
 use crate::core::border;
-use crate::core::{Rectangle, Size, Transformation};
+use crate::core::{Point, Rectangle, Size, Transformation};
 use crate::graphics::Shell;
 
 use bytemuck::{Pod, Zeroable};
@@ -313,6 +313,23 @@ impl State {
                     bounds,
                     clip_bounds,
                 } => {
+                    let physical_bounds = Rectangle::new(
+                        Point::new(
+                            (bounds.x * scale).round(),
+                            (bounds.y * scale).round(),
+                        ),
+                        Size::new(
+                            (bounds.width * scale).round(),
+                            (bounds.height * scale).round(),
+                        ),
+                    );
+
+                    if physical_bounds.width < 1.0
+                        || physical_bounds.height < 1.0
+                    {
+                        continue;
+                    }
+
                     if let Some((atlas_entry, bind_group)) = cache
                         .upload_vector(
                             device,
@@ -320,8 +337,10 @@ impl State {
                             belt,
                             &svg.handle,
                             svg.color,
-                            bounds.size(),
-                            scale,
+                            Size::new(
+                                physical_bounds.width as u32,
+                                physical_bounds.height as u32,
+                            ),
                         )
                     {
                         match atlas.as_mut() {
@@ -341,7 +360,7 @@ impl State {
                         }
 
                         add_instances(
-                            *bounds,
+                            physical_bounds * (1.0 / scale),
                             *clip_bounds,
                             border::radius(0),
                             f32::from(svg.rotation),
